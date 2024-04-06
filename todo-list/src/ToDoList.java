@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class ToDoList {
     // ATTRIBUTES FOR DB CONNECTION
-    private String url = "jdbc:sqlite:/Users/tomasmatteozzi/Documents/workspaces/projects/todo-list/src/todolist.db";
+    private String url = "jdbc:sqlite:/Users/tomasmatteozzi/Documents/workspaces/uni/ingenieria-de-software-2/todo-list/todo-list/src/todolist.db";
     private Connection connection = null;
 
     public ToDoList(){
