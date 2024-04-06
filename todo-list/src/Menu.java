@@ -116,6 +116,7 @@ public class Menu extends JFrame {
 
 
     public void showCompleted() {
+        addItemButton.setVisible(false);
         // EMPTY THE ITEM PANEL
         itemPanel.removeAll();
         items = todoList.getAllItems();
@@ -146,6 +147,7 @@ public class Menu extends JFrame {
     }
 
     public void mainMenu() { // UPDATE MAIN LIST AND CHANGE BUTTON TEXT
+        addItemButton.setVisible(true);
         updateList();
         showCompletedButton.setText("FINISHED");
         showingCompleted = false;
