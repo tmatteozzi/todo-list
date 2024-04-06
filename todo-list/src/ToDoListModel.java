@@ -1,24 +1,21 @@
-import java.util.ArrayList;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class ToDoListModel {
-    // ATTRIBUTES FOR DB CONNECTION
-    private String url = "jdbc:sqlite:/Users/tomasmatteozzi/Documents/workspaces/uni/ingenieria-de-software-2/todo-list/todo-list/src/todolist.db";
+    private static final String DB_URL = "jdbc:sqlite:/Users/tomasmatteozzi/Documents/workspaces/uni/ingenieria-de-software-2/todo-list/todo-list/src/todolist.db";
     private Connection connection = null;
     private ArrayList<Item> itemList;
 
     public ToDoListModel() {
+        itemList = new ArrayList<>();
         try {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection(url);
-            if (connection != null) {
-                System.out.println("Conexion exitosa a la BD.");
-            }
+            connection = DriverManager.getConnection(DB_URL);
+            System.out.println("Conexión exitosa a la BD.");
+            loadItemsFromDatabase();
         } catch (ClassNotFoundException | SQLException e) {
-            System.out.println(e.getMessage());
+            handleException(e);
         }
-        itemList = new ArrayList<>();
-        loadItemsFromDatabase(); // Load items from the database
     }
 
     private void loadItemsFromDatabase() {
@@ -36,7 +33,7 @@ public class ToDoListModel {
 
             statement.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            handleException(e);
         }
     }
 
@@ -49,9 +46,9 @@ public class ToDoListModel {
             statement.setDate(3, Date.valueOf(item.getDate()));
             statement.executeUpdate();
             statement.close();
-            itemList.add(item); // Add item to the list after successful insertion
+            itemList.add(item);
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            handleException(e);
         }
     }
 
@@ -63,13 +60,13 @@ public class ToDoListModel {
             int deleted = statement.executeUpdate();
             statement.close();
             if (deleted > 0) {
-                itemList.remove(item); // Remove item from list if deleted from database
+                itemList.remove(item);
                 return true;
             } else {
-                throw new Exception("No se pudo eliminar");
+                throw new SQLException("No se pudo eliminar");
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            handleException(e);
             return false;
         }
     }
@@ -82,7 +79,7 @@ public class ToDoListModel {
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            handleException(e);
         }
     }
 
@@ -108,5 +105,10 @@ public class ToDoListModel {
             }
         }
         return completedItems;
+    }
+
+    private void handleException(Exception e) {
+        e.printStackTrace();
+        // Aquí puedes agregar código para manejar la excepción de manera adecuada, por ejemplo, mostrar un mensaje de error al usuario.
     }
 }

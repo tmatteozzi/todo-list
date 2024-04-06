@@ -10,7 +10,7 @@ public class ToDoListController {
         this.view = view;
         this.model = model;
 
-        view.updateList(model.getUnfinishedItems(), false); // Mostrar solo los ítems no completados al inicio
+        view.updateList(model.getUnfinishedItems(), false);
         view.cargarAgregarItemListener(new AgregarItemListener());
         view.cargarMostrarCompletadosListener(new MostrarCompletadosListener());
         view.cargarSalirListener(new SalirListener());
@@ -33,10 +33,10 @@ public class ToDoListController {
         public void actionPerformed(ActionEvent e) {
             if (enMenuPrincipal) {
                 enMenuPrincipal = false;
-                actualizarLista(); // Mostrar todos los ítems nuevamente al regresar al menú principal
+                actualizarLista();
                 view.transformarEnMenuPrincipal(false); 
             } else {
-                view.updateList(model.getCompletedItems(), true); // Mostrar solo los ítems completados
+                view.updateList(model.getCompletedItems(), true);
                 view.transformarEnMenuPrincipal(true);
                 enMenuPrincipal = true;
             }
@@ -49,12 +49,10 @@ public class ToDoListController {
         }
     }
 
-    // Método para actualizar la lista después de realizar operaciones de edición
     public void actualizarLista() {
-        view.updateList(model.getAllItems(), false); // Actualizar la lista mostrando todos los ítems
+        view.updateList(model.getAllItems(), false);
     }
 
-    // Método para indicar que se está en el menú principal
     public void setEnMenuPrincipal(boolean enMenuPrincipal) {
         this.enMenuPrincipal = enMenuPrincipal;
     }
