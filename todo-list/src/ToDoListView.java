@@ -59,7 +59,7 @@ public class ToDoListView extends JFrame {
                 JButton finishButton = new JButton("Finalizar");
                 finishButton.addActionListener(e -> {
                     model.finishItem(item);
-                    updateList(model.getAllItems(), showCompleted);
+                    updateList(model.getUnfinishedItems(), showCompleted);
                 });
                 itemRow.add(finishButton, BorderLayout.EAST);
             }
@@ -111,7 +111,7 @@ public class ToDoListView extends JFrame {
         } else {
             buttonPanel.add(addItemButton);
         }
-        showCompletedButton.setText("Menú Principal");
+        showCompletedButton.setText("COMPLETADOS");
         showCompletedButton.addActionListener(e -> {
             if (!ocultarAgregarItem) {
                 buttonPanel.add(addItemButton);
@@ -121,10 +121,5 @@ public class ToDoListView extends JFrame {
         });
         buttonPanel.revalidate();
         buttonPanel.repaint();
-    }
-
-    // Método para cambiar la visibilidad del botón "Finalizar"
-    public void setShowFinishButton(boolean showFinishButton) {
-        this.showFinishButton = showFinishButton;
     }
 }

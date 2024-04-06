@@ -34,12 +34,10 @@ public class ToDoListController {
             if (enMenuPrincipal) {
                 enMenuPrincipal = false;
                 actualizarLista(); // Mostrar todos los ítems nuevamente al regresar al menú principal
-                view.transformarEnMenuPrincipal(false); // Transformar el botón de completados en menú principal
-                view.setShowFinishButton(true); // Mostrar botón "Finalizar" en la lista de ítems
+                view.transformarEnMenuPrincipal(false); 
             } else {
                 view.updateList(model.getCompletedItems(), true); // Mostrar solo los ítems completados
-                view.transformarEnMenuPrincipal(true); // Transformar el botón de completados en menú principal
-                view.setShowFinishButton(false); // Ocultar botón "Finalizar" en la lista de ítems
+                view.transformarEnMenuPrincipal(true);
                 enMenuPrincipal = true;
             }
         }
