@@ -22,10 +22,6 @@ public class ToDoListModel {
         itemList = toDoList.getAllItems();
     }
 
-    public ArrayList<Item> getAllItems() {
-        return itemList;
-    }
-
     public void addItem(Item item) {
         try{
             String sql = "INSERT INTO Item (description, done, date) VALUES (?, ?, ?)";
@@ -61,6 +57,20 @@ public class ToDoListModel {
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
+    }
+
+    public ArrayList<Item> getAllItems() {
+        return itemList;
+    }
+
+    public ArrayList<Item> getUnfinishedItems() {
+        ArrayList<Item> unfinishedItems = new ArrayList<>();
+        for (Item item : itemList) {
+            if (!item.isDone()) {
+                unfinishedItems.add(item);
+            }
+        }
+        return unfinishedItems;
     }
 
     public ArrayList<Item> getCompletedItems() {

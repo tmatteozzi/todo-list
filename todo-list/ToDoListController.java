@@ -11,7 +11,7 @@ public class ToDoListController {
         this.view = view;
         this.model = model;
 
-        view.updateList(model.getAllItems(), false); // Mostrar solo los ítems no completados al inicio
+        view.updateList(model.getUnfinishedItems(), false); // Mostrar solo los ítems no completados al inicio
         view.cargarAgregarItemListener(new AgregarItemListener());
         view.cargarMostrarCompletadosListener(new MostrarCompletadosListener());
         view.cargarSalirListener(new SalirListener());
