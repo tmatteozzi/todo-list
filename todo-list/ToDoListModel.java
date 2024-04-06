@@ -35,7 +35,7 @@ public class ToDoListModel {
         }
     }
 
-    public void deleteItem(Item item) {
+    public boolean deleteItem(Item item) {
         try{
             String sql = "DELETE FROM Item WHERE description = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -43,8 +43,14 @@ public class ToDoListModel {
             // IF I DELETE IT SUM 1
             int deleted = statement.executeUpdate();
             statement.close();
+            if(deleted > 0){
+                return true;
+            } else {
+                throw new Exception("No se pudo eliminar");
+            }
         } catch (Exception e){
             System.out.println(e.getMessage());
+            return false;
         }
     }
 
