@@ -11,6 +11,7 @@ public class ToDoListController {
         this.model = model;
 
         view.updateList(model.getUnfinishedItems(), false, enMenuPrincipal);
+        // CARGAR LISTENERS
         view.cargarAgregarItemListener(new AgregarItemListener());
         view.cargarMostrarCompletadosListener(new MostrarCompletadosListener());
         view.cargarSalirListener(new SalirListener());

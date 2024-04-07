@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class ToDoListView extends JFrame {
     private JPanel buttonPanel, itemPanel;
-    private JButton showCompletedButton, addItemButton, exitButton;
+    private JButton CompletedButton, addItemButton, exitButton;
     private JTextArea textArea;
     private JScrollPane scrollPane;
     private ToDoListModel model;
@@ -16,25 +16,37 @@ public class ToDoListView extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         addItemButton = new JButton("AGREGAR ITEM");
-        showCompletedButton = new JButton("COMPLETADOS");
+        CompletedButton = new JButton("COMPLETADOS");
         exitButton = new JButton("SALIR");
 
         buttonPanel = new JPanel();
         buttonPanel.add(addItemButton);
-        buttonPanel.add(showCompletedButton);
+        buttonPanel.add(CompletedButton);
         buttonPanel.add(exitButton);
 
         itemPanel = new JPanel();
         itemPanel.setLayout(new BoxLayout(itemPanel, BoxLayout.Y_AXIS));
+        itemPanel.setPreferredSize(new Dimension(itemPanel.getPreferredSize().width, 50));
 
         textArea = new JTextArea(5, 20);
+
         scrollPane = new JScrollPane(textArea);
 
+        // Obtener el tamaño de la pantalla
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int screenWidth = screenSize.width;
+        int screenHeight = screenSize.height;
+
+        // Establecer el tamaño del JFrame al 50% de la pantalla
+        setSize(screenWidth / 2, screenHeight / 2);
+
+        // Configurar el layout del JFrame
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(buttonPanel, BorderLayout.NORTH);
         getContentPane().add(new JScrollPane(itemPanel), BorderLayout.CENTER);
         getContentPane().add(scrollPane, BorderLayout.SOUTH);
-        pack();
+
+        // Hacer visible el JFrame
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -107,7 +119,7 @@ public class ToDoListView extends JFrame {
     }
 
     public void cargarMostrarCompletadosListener(ActionListener listener) {
-        showCompletedButton.addActionListener(listener);
+        CompletedButton.addActionListener(listener);
     }
 
     public void cargarSalirListener(ActionListener listener) {
@@ -117,17 +129,11 @@ public class ToDoListView extends JFrame {
     // Método para ocultar o mostrar el botón de agregar ítem y transformar el botón de completados en menú principal
     public void transformarEnMenuPrincipal(boolean ocultarAgregarItem, boolean enMenuPrincipal) {
         addItemButton.setVisible(!ocultarAgregarItem);
-        
-        if (enMenuPrincipal) {
-            showCompletedButton.setText("Menu principal");
-        } else {
-            showCompletedButton.setText("COMPLETADOS");
-        }
-        showCompletedButton.addActionListener(e -> {
+        CompletedButton.addActionListener(e -> {
             if (!ocultarAgregarItem) {
                 addItemButton.setVisible(true);
             }
-            showCompletedButton.setText(enMenuPrincipal ? "COMPLETADOS" : "Menu principal");
+            CompletedButton.setText(enMenuPrincipal ? "COMPLETADOS" : "MENU PRINCIPAL");
             updateList(model.getAllItems(), false, !enMenuPrincipal); // Mostrar todos los ítems nuevamente al regresar al menú principal
         });
         buttonPanel.revalidate();
