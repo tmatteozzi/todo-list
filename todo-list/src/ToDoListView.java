@@ -9,7 +9,6 @@ public class ToDoListView extends JFrame {
     private JTextArea textArea;
     private JScrollPane scrollPane;
     private ToDoListModel model;
-    private boolean showFinishButton = true;
 
     public ToDoListView(ToDoListModel model) {
         this.model = model;
@@ -40,45 +39,56 @@ public class ToDoListView extends JFrame {
         setVisible(true);
     }
 
-    public void updateList(ArrayList<Item> itemList, boolean showCompleted) {
+    public void updateList(ArrayList<Item> itemList, boolean showCompleted, boolean enMenuPrincipal) {
         itemPanel.removeAll();
         for (Item item : itemList) {
-            if (showCompleted && !item.isDone()) {
-                continue; // Si se quiere mostrar completados y este ítem no está completado, saltarlo
+            // Si se quiere mostrar completados y el ítem no está completado, o viceversa, saltar al siguiente ítem
+            if ((showCompleted && !item.isDone()) || (!showCompleted && item.isDone())) {
+                continue;
             }
-            if (!showCompleted && item.isDone()) {
-                continue; // Si no se quiere mostrar completados y este ítem está completado, saltarlo
-            }
-
+    
+            // CREAR PANEL PARA EL ITEM
             JPanel itemRow = new JPanel();
             itemRow.setLayout(new BorderLayout());
-
             JLabel itemLabel = new JLabel(item.getDescription());
-
-            if (showFinishButton) {
-                JButton finishButton = new JButton("Finalizar");
-                finishButton.addActionListener(e -> {
-                    model.finishItem(item);
-                    updateList(model.getUnfinishedItems(), showCompleted);
-                });
-                itemRow.add(finishButton, BorderLayout.EAST);
-            }
-
-            JButton deleteButton = new JButton("Eliminar");
-            deleteButton.addActionListener(e -> {
-                model.deleteItem(item);
-                updateList(model.getAllItems(), showCompleted);
+            itemRow.setPreferredSize(new Dimension(itemRow.getPreferredSize().width, 50));
+    
+            // BOTONES
+            JButton finishButton = new JButton("FINALIZAR");
+            finishButton.addActionListener(e -> {
+                model.finishItem(item);
+                // ACTUALIZAR VISTA
+                updateList(model.getAllItems(), showCompleted, enMenuPrincipal);
             });
 
-            itemRow.add(itemLabel, BorderLayout.CENTER);
-            itemRow.add(deleteButton, BorderLayout.WEST);
+            JButton deleteButton = new JButton("ELIMINAR");
+            deleteButton.addActionListener(e -> {
+                model.deleteItem(item);
+                // ACTUALIZAR VISTA
+                updateList(model.getAllItems(), showCompleted, enMenuPrincipal);
+            });
+    
+            // Crear un panel para los botones y establecer su diseño como FlowLayout con alineación a la derecha
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
+            // Añadir los botones al panel de botones
+            buttonPanel.add(deleteButton);
+            if(!enMenuPrincipal){
+                buttonPanel.add(finishButton);
+            }
+            itemRow.add(itemLabel, BorderLayout.WEST);
+            // Añadir el panel de botones al panel de ítem
+            itemRow.add(buttonPanel, BorderLayout.LINE_END);
+    
+            // Añadir el panel del ítem al panel principal
             itemPanel.add(itemRow);
         }
-
+    
+        // Volver a validar el panel de ítems y repintar la vista
         itemPanel.revalidate();
         itemPanel.repaint();
     }
+    
 
     public String showInputDialog(String message) {
         return JOptionPane.showInputDialog(this, message);
@@ -105,19 +115,20 @@ public class ToDoListView extends JFrame {
     }
 
     // Método para ocultar o mostrar el botón de agregar ítem y transformar el botón de completados en menú principal
-    public void transformarEnMenuPrincipal(boolean ocultarAgregarItem) {
-        if (ocultarAgregarItem) {
-            buttonPanel.remove(addItemButton);
+    public void transformarEnMenuPrincipal(boolean ocultarAgregarItem, boolean enMenuPrincipal) {
+        addItemButton.setVisible(!ocultarAgregarItem);
+        
+        if (enMenuPrincipal) {
+            showCompletedButton.setText("Menu principal");
         } else {
-            buttonPanel.add(addItemButton);
+            showCompletedButton.setText("COMPLETADOS");
         }
-        showCompletedButton.setText("COMPLETADOS");
         showCompletedButton.addActionListener(e -> {
             if (!ocultarAgregarItem) {
-                buttonPanel.add(addItemButton);
+                addItemButton.setVisible(true);
             }
-            showCompletedButton.setText("COMPLETADOS");
-            updateList(model.getAllItems(), false); // Mostrar todos los ítems nuevamente al regresar al menú principal
+            showCompletedButton.setText(enMenuPrincipal ? "COMPLETADOS" : "Menu principal");
+            updateList(model.getAllItems(), false, !enMenuPrincipal); // Mostrar todos los ítems nuevamente al regresar al menú principal
         });
         buttonPanel.revalidate();
         buttonPanel.repaint();

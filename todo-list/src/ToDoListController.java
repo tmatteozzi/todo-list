@@ -10,7 +10,7 @@ public class ToDoListController {
         this.view = view;
         this.model = model;
 
-        view.updateList(model.getUnfinishedItems(), false);
+        view.updateList(model.getUnfinishedItems(), false, enMenuPrincipal);
         view.cargarAgregarItemListener(new AgregarItemListener());
         view.cargarMostrarCompletadosListener(new MostrarCompletadosListener());
         view.cargarSalirListener(new SalirListener());
@@ -34,10 +34,10 @@ public class ToDoListController {
             if (enMenuPrincipal) {
                 enMenuPrincipal = false;
                 actualizarLista();
-                view.transformarEnMenuPrincipal(false); 
+                view.transformarEnMenuPrincipal(false, enMenuPrincipal); 
             } else {
-                view.updateList(model.getCompletedItems(), true);
-                view.transformarEnMenuPrincipal(true);
+                view.updateList(model.getCompletedItems(), true, !enMenuPrincipal);
+                view.transformarEnMenuPrincipal(true, enMenuPrincipal);
                 enMenuPrincipal = true;
             }
         }
@@ -50,7 +50,7 @@ public class ToDoListController {
     }
 
     public void actualizarLista() {
-        view.updateList(model.getAllItems(), false);
+        view.updateList(model.getAllItems(), false, enMenuPrincipal);
     }
 
     public void setEnMenuPrincipal(boolean enMenuPrincipal) {
