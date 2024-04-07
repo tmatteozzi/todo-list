@@ -4,7 +4,7 @@ import java.awt.event.ActionListener;
 public class ToDoListController {
     private ToDoListView view;
     private ToDoListModel model;
-    private boolean enMenuPrincipal = false;
+    private boolean enMenuPrincipal = true;
 
     public ToDoListController(ToDoListView view, ToDoListModel model) {
         this.view = view;
@@ -52,9 +52,5 @@ public class ToDoListController {
 
     public void actualizarLista() {
         view.updateList(model.getAllItems(), false, enMenuPrincipal);
-    }
-
-    public void setEnMenuPrincipal(boolean enMenuPrincipal) {
-        this.enMenuPrincipal = enMenuPrincipal;
     }
 }
