@@ -15,7 +15,7 @@ public class DbBroker {
         }
     }
 
-    static ArrayList<Item> getAllItems(){
+    static ArrayList<Item> getAllItems() throws SQLException{
         ArrayList<Item> itemList = new ArrayList<>();
         try {
             String sql = "SELECT * FROM Item";
@@ -31,12 +31,11 @@ public class DbBroker {
             statement.close();
             return itemList;
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return null;
+            throw new SQLException("Error al obtener todos los ítems: " + e.getMessage());
         }
     }
 
-    static void addItem(Item item) {
+    static void addItem(Item item) throws SQLException {
         try {
             String sql = "INSERT INTO Item (description, done, date) VALUES (?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -46,11 +45,11 @@ public class DbBroker {
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new SQLException("Error al agregar un ítem: " + e.getMessage());
         }
     }
 
-    static boolean deleteItem(Item item) {
+    static boolean deleteItem(Item item) throws SQLException {
         try {
             String sql = "DELETE FROM Item WHERE description = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -63,12 +62,11 @@ public class DbBroker {
                 throw new SQLException("No se pudo eliminar");
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return false;
+            throw new SQLException("Error al eliminar un ítem: " + e.getMessage());
         }
     }
 
-    static void finishItem(Item item) {
+    static void finishItem(Item item) throws SQLException {
         try {
             String sql = "UPDATE Item SET done = 1 WHERE description = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -76,7 +74,7 @@ public class DbBroker {
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new SQLException("Error al finalizar un ítem: " + e.getMessage());
         }
     }
 }
