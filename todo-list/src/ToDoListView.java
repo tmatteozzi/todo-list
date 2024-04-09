@@ -122,11 +122,32 @@ public class ToDoListView extends JFrame {
     }
 
     public void cargarMostrarCompletadosListener(ActionListener listener) {
-        menuButton.addActionListener(listener); // Cambiamos el nombre del botón aquí
+        menuButton.addActionListener(listener);
     }
 
     public void cargarSalirListener(ActionListener listener) {
         exitButton.addActionListener(listener);
+    }
+
+    public void cargarEliminarItemListener(ActionListener listener) {
+        for (Component component : itemPanel.getComponents()) {
+            if (component instanceof JPanel) {
+                JPanel itemRow = (JPanel) component;
+                for (Component comp : itemRow.getComponents()) {
+                    if (comp instanceof JPanel) {
+                        JPanel buttonPanel = (JPanel) comp;
+                        for (Component btnComp : buttonPanel.getComponents()) {
+                            if (btnComp instanceof JButton) {
+                                JButton deleteButton = (JButton) btnComp;
+                                if (deleteButton.getText().equals("ELIMINAR")) {
+                                    deleteButton.addActionListener(listener);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void actualizarNombreBotonMenu(boolean enMenuPrincipal) {

@@ -29,14 +29,17 @@ public class ToDoListModel {
 
     public void deleteItem(Item item) {
         try {
-            DbBroker.deleteItem(item);
-            if (true) {
+            boolean deleted = DbBroker.deleteItem(item);
+            if (deleted) {
                 itemList.remove(item);
-            } 
+            } else {
+                throw new Exception("Error al eliminar el ítem de la base de datos.");
+            }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error al eliminar el ítem: " + e.getMessage());
         }
     }
+    
 
     public void finishItem(Item item) {
         try {

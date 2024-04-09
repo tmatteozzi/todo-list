@@ -1,5 +1,6 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.*;
 
 public class ToDoListController {
     private ToDoListView view;
@@ -14,6 +15,7 @@ public class ToDoListController {
         view.cargarAgregarItemListener(new AgregarItemListener());
         view.cargarMostrarCompletadosListener(new MostrarCompletadosListener());
         view.cargarSalirListener(new SalirListener());
+        view.cargarEliminarItemListener(new EliminarItemListener());
 
         // Mostrar los ítems no finalizados al inicio
         view.updateUnfinished(model.getUnfinishedItems());
@@ -58,4 +60,38 @@ public class ToDoListController {
             System.exit(0);
         }
     }
+
+    class EliminarItemListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            JButton deleteButton = (JButton) e.getSource();
+            JPanel buttonPanel = (JPanel) deleteButton.getParent();
+            JPanel itemPanel = (JPanel) buttonPanel.getParent();
+            JLabel itemLabel = (JLabel) itemPanel.getComponent(0);
+            String description = itemLabel.getText();
+    
+            // Llamar al método del controlador para eliminar el ítem
+            eliminarItem(description);
+        }
+    
+        private void eliminarItem(String description) {
+            Item itemToDelete = null;
+    
+            for (Item item : model.getUnfinishedItems()) {
+                if (item.getDescription().equals(description)) {
+                    itemToDelete = item;
+                    break;
+                }
+            }
+    
+            if (itemToDelete != null) {
+                model.deleteItem(itemToDelete);
+                if (enMenuPrincipal) {
+                    view.updateUnfinished(model.getUnfinishedItems());
+                } else {
+                    view.updateCompleted(model.getCompletedItems());
+                }
+            }
+        }
+    }
+    
 }
