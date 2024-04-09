@@ -4,10 +4,21 @@ public class ToDoListModel {
     private ArrayList<Item> itemList;
 
     public ToDoListModel() {
-        itemList = new ArrayList<>();new DbBroker();
+        itemList = new ArrayList<>();
+        new DbBroker();
+        getAllItems();
+        System.out.println();
     }
 
     // MÉTODOS DE LA DB
+    public void getAllItems(){
+        try {
+            itemList = DbBroker.getAllItems();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
     public void addItem(Item item) {
         try {
             DbBroker.addItem(item);
@@ -37,10 +48,6 @@ public class ToDoListModel {
     }
 
     // METODOS ARRAYLIST
-    public ArrayList<Item> getAllItems() {
-        return itemList;
-    }
-
     public ArrayList<Item> getUnfinishedItems() {
         ArrayList<Item> unfinishedItems = new ArrayList<>();
         for (Item item : itemList) {
@@ -59,7 +66,5 @@ public class ToDoListModel {
             }
         }
         return completedItems;
-    }
-
-    
+    }   
 }
