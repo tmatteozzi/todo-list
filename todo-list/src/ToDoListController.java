@@ -10,10 +10,17 @@ public class ToDoListController {
         this.view = view;
         this.model = model;
 
-        // CARGAR LISTENERS
+        // Cargar listeners
         view.cargarAgregarItemListener(new AgregarItemListener());
         view.cargarMostrarCompletadosListener(new MostrarCompletadosListener());
         view.cargarSalirListener(new SalirListener());
+
+        // Mostrar los ítems no finalizados al inicio
+        view.updateUnfinished(model.getUnfinishedItems());
+
+        // Actualizar el nombre y la visibilidad del botón según el estado inicial
+        view.actualizarNombreBotonMenu(enMenuPrincipal);
+        view.ocultarAgregarItem(!enMenuPrincipal);
     }
 
     class AgregarItemListener implements ActionListener {
@@ -21,7 +28,11 @@ public class ToDoListController {
             String description = view.showInputDialog("Ingrese la descripción del nuevo ítem:");
             if (description != null && !description.isEmpty()) {
                 model.addItem(new Item(description));
-                actualizarLista();
+                if (enMenuPrincipal) {
+                    view.updateUnfinished(model.getUnfinishedItems());
+                } else {
+                    view.updateCompleted(model.getCompletedItems());
+                }
                 view.limpiarTextArea();
             } else {
                 view.mostrarError("El campo de descripción está vacío.");
@@ -32,14 +43,13 @@ public class ToDoListController {
     class MostrarCompletadosListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             if (enMenuPrincipal) {
-                enMenuPrincipal = false;
-                actualizarLista();
-                view.transformarEnMenuPrincipal(false, enMenuPrincipal);
+                view.updateCompleted(model.getCompletedItems());
             } else {
-                view.updateList(model.getCompletedItems(), true, !enMenuPrincipal);
-                view.transformarEnMenuPrincipal(true, enMenuPrincipal);
-                enMenuPrincipal = true;
+                view.updateUnfinished(model.getUnfinishedItems());
             }
+            enMenuPrincipal = !enMenuPrincipal;
+            view.actualizarNombreBotonMenu(enMenuPrincipal);
+            view.ocultarAgregarItem(!enMenuPrincipal);
         }
     }
 
@@ -47,9 +57,5 @@ public class ToDoListController {
         public void actionPerformed(ActionEvent e) {
             System.exit(0);
         }
-    }
-
-    public void actualizarLista() {
-        view.updateList(model.getAllItems(), false, enMenuPrincipal);
     }
 }
