@@ -16,10 +16,6 @@ public class ToDoListController {
         view.cargarSalirListener(new SalirListener());
     }
 
-    public void init() {
-        view.updateList(model.getUnfinishedItems(), false, enMenuPrincipal);
-    }
-
     class AgregarItemListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String description = view.showInputDialog("Ingrese la descripción del nuevo ítem:");
