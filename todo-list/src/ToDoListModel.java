@@ -7,7 +7,6 @@ public class ToDoListModel {
         itemList = new ArrayList<>();
         new DbBroker();
         getAllItems();
-        System.out.println();
     }
 
     // MÉTODOS DE LA DB
