@@ -10,11 +10,14 @@ public class ToDoListController {
         this.view = view;
         this.model = model;
 
-        view.updateList(model.getUnfinishedItems(), false, enMenuPrincipal);
         // CARGAR LISTENERS
         view.cargarAgregarItemListener(new AgregarItemListener());
         view.cargarMostrarCompletadosListener(new MostrarCompletadosListener());
         view.cargarSalirListener(new SalirListener());
+    }
+
+    public void init() {
+        view.updateList(model.getUnfinishedItems(), false, enMenuPrincipal);
     }
 
     class AgregarItemListener implements ActionListener {
@@ -35,7 +38,7 @@ public class ToDoListController {
             if (enMenuPrincipal) {
                 enMenuPrincipal = false;
                 actualizarLista();
-                view.transformarEnMenuPrincipal(false, enMenuPrincipal); 
+                view.transformarEnMenuPrincipal(false, enMenuPrincipal);
             } else {
                 view.updateList(model.getCompletedItems(), true, !enMenuPrincipal);
                 view.transformarEnMenuPrincipal(true, enMenuPrincipal);

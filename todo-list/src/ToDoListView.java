@@ -7,11 +7,8 @@ public class ToDoListView extends JFrame {
     private JPanel buttonPanel, itemPanel;
     private JButton CompletedButton, addItemButton, exitButton;
     private JTextArea textArea;
-    private JScrollPane scrollPane;
-    private ToDoListModel model;
 
-    public ToDoListView(ToDoListModel model) {
-        this.model = model;
+    public ToDoListView() {
         setTitle("TO DO LIST");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -26,11 +23,8 @@ public class ToDoListView extends JFrame {
 
         itemPanel = new JPanel();
         itemPanel.setLayout(new BoxLayout(itemPanel, BoxLayout.Y_AXIS));
-        itemPanel.setPreferredSize(new Dimension(itemPanel.getPreferredSize().width, 50));
 
         textArea = new JTextArea(5, 20);
-
-        scrollPane = new JScrollPane(textArea);
 
         // Obtener el tamaño de la pantalla
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -44,7 +38,7 @@ public class ToDoListView extends JFrame {
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(buttonPanel, BorderLayout.NORTH);
         getContentPane().add(new JScrollPane(itemPanel), BorderLayout.CENTER);
-        getContentPane().add(scrollPane, BorderLayout.SOUTH);
+        getContentPane().add(new JScrollPane(textArea), BorderLayout.SOUTH);
 
         // Hacer visible el JFrame
         setLocationRelativeTo(null);
@@ -58,49 +52,37 @@ public class ToDoListView extends JFrame {
             if ((showCompleted && !item.isDone()) || (!showCompleted && item.isDone())) {
                 continue;
             }
-    
+
             // CREAR PANEL PARA EL ITEM
             JPanel itemRow = new JPanel();
             itemRow.setLayout(new BorderLayout());
             JLabel itemLabel = new JLabel(item.getDescription());
             itemRow.setPreferredSize(new Dimension(itemRow.getPreferredSize().width, 50));
-    
+
             // BOTONES
             JButton finishButton = new JButton("FINALIZAR");
-            finishButton.addActionListener(e -> {
-                model.finishItem(item);
-                // ACTUALIZAR VISTA
-                updateList(model.getAllItems(), showCompleted, enMenuPrincipal);
-            });
-
             JButton deleteButton = new JButton("ELIMINAR");
-            deleteButton.addActionListener(e -> {
-                model.deleteItem(item);
-                // ACTUALIZAR VISTA
-                updateList(model.getAllItems(), showCompleted, enMenuPrincipal);
-            });
-    
+
             // Crear un panel para los botones y establecer su diseño como FlowLayout con alineación a la derecha
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
             // Añadir los botones al panel de botones
             buttonPanel.add(deleteButton);
-            if(!enMenuPrincipal){
+            if (!enMenuPrincipal) {
                 buttonPanel.add(finishButton);
             }
             itemRow.add(itemLabel, BorderLayout.WEST);
             // Añadir el panel de botones al panel de ítem
             itemRow.add(buttonPanel, BorderLayout.LINE_END);
-    
+
             // Añadir el panel del ítem al panel principal
             itemPanel.add(itemRow);
         }
-    
+
         // Volver a validar el panel de ítems y repintar la vista
         itemPanel.revalidate();
         itemPanel.repaint();
     }
-    
 
     public String showInputDialog(String message) {
         return JOptionPane.showInputDialog(this, message);
@@ -134,7 +116,7 @@ public class ToDoListView extends JFrame {
                 addItemButton.setVisible(true);
             }
             CompletedButton.setText(enMenuPrincipal ? "COMPLETADOS" : "MENU PRINCIPAL");
-            updateList(model.getAllItems(), false, !enMenuPrincipal); // Mostrar todos los ítems nuevamente al regresar al menú principal
+            // Implementa esta lógica según tus necesidades
         });
         buttonPanel.revalidate();
         buttonPanel.repaint();
