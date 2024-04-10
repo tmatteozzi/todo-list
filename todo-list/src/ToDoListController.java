@@ -10,15 +10,13 @@ public class ToDoListController {
         this.view = view;
         this.model = model;
 
-        // Cargar listeners
+        // CARGAR LISTENERS
         view.cargarAgregarItemListener(new AgregarItemListener());
         view.cargarMostrarCompletadosListener(new MostrarCompletadosListener());
         view.cargarSalirListener(new SalirListener());
 
-        // Mostrar los ítems no finalizados al inicio
+        // MOSTRAR MENU PRINCIPAL AL INICIO & CONFIGURACIÓN INICIAL
         view.updateUnfinished(model.getUnfinishedItems());
-
-        // Actualizar el nombre y la visibilidad del botón según el estado inicial
         view.actualizarNombreBotonMenu(enMenuPrincipal);
         view.ocultarAgregarItem(!enMenuPrincipal);
     }
