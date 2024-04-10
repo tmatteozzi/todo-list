@@ -39,7 +39,6 @@ public class ToDoListModel {
             System.out.println("Error al eliminar el ítem: " + e.getMessage());
         }
     }
-    
 
     public void finishItem(Item item) {
         try {
@@ -47,6 +46,16 @@ public class ToDoListModel {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public Item getItem(int id) {
+        Item item;
+        try{
+            return DbBroker.getItem(id);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
 
     // METODOS ARRAYLIST
