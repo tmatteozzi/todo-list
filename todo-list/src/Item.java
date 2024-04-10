@@ -2,6 +2,7 @@ import java.time.LocalDate;
 
 public class Item {
     // ATTRIBUTES
+    private int id;
     private String description;
     private boolean done;
     private LocalDate date;
@@ -22,13 +23,14 @@ public class Item {
         }
     }
 
-    // CONSTRUCTOR FOR SQL QUERY
-    public Item(String description, boolean done, LocalDate date){
+    // CONSTRUCTOR
+    public Item(int id, String description, boolean done, LocalDate date){
+        this.id = id;
         this.description = description;
         this.done = done;
         this.date = date;
     }
-
+    public int getId() { return id; }
     public String getDescription() { return description; }
     public boolean isDone() { return done; }
     public LocalDate getDate() { return date; }

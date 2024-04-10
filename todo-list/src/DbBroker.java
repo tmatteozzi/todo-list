@@ -23,10 +23,11 @@ public class DbBroker {
             ResultSet resultSet = statement.executeQuery(sql);
 
             while (resultSet.next()) {
+                int id = resultSet.getInt("id");
                 String description = resultSet.getString("description");
                 boolean done = resultSet.getBoolean("done");
                 Date date = resultSet.getDate("date");
-                itemList.add(new Item(description, done, date.toLocalDate()));
+                itemList.add(new Item(id, description, done, date.toLocalDate()));
             }
             statement.close();
             return itemList;
@@ -77,4 +78,26 @@ public class DbBroker {
             throw new SQLException("Error al finalizar un ítem: " + e.getMessage());
         }
     }
+
+    static Item getItem(int id) throws SQLException {
+        try {
+            String sql = "SELECT * FROM Item WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String description = resultSet.getString("description");
+                boolean done = resultSet.getBoolean("done");
+                Date date = resultSet.getDate("date");
+                // Assuming your Item class has a constructor that accepts these parameters
+                return new Item(id, description, done, date.toLocalDate());
+            } else {
+                throw new SQLException("No item found with ID: " + id);
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Error retrieving item by ID: " + e.getMessage());
+        }
+    }
+
 }
