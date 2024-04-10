@@ -23,7 +23,7 @@ public class Item {
         }
     }
 
-    // CONSTRUCTOR FOR SQL QUERY
+    // CONSTRUCTOR
     public Item(int id, String description, boolean done, LocalDate date){
         this.id = id;
         this.description = description;

@@ -7,6 +7,9 @@ public class ToDoListView extends JFrame {
     private JPanel buttonPanel, itemPanel;
     private JButton menuButton, addItemButton, exitButton;
     private JTextArea textArea;
+    private ArrayList<JButton> deleteButtons = new ArrayList<>();
+    private ArrayList<JButton> finishButtons = new ArrayList<>();
+
 
     public ToDoListView() {
         // CONFIGURACIÓN INTERFAZ FRAME
@@ -48,6 +51,10 @@ public class ToDoListView extends JFrame {
             // BOTONES
             JButton finishButton = new JButton("FINALIZAR");
             JButton deleteButton = new JButton("ELIMINAR");
+            deleteButton.setActionCommand(String.valueOf(item.getId())); // Establecer el ActionCommand con el ID del ítem
+            finishButton.setActionCommand(String.valueOf(item.getId())); // Esto puede ser útil si deseas agregar funcionalidad para "finalizar" un ítem también.
+            deleteButtons.add(deleteButton);
+            finishButtons.add(finishButton);
             // CREAR PANEL DE BOTONES Y AGREGARLOS
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             buttonPanel.add(deleteButton);
@@ -55,6 +62,9 @@ public class ToDoListView extends JFrame {
             itemRow.add(itemLabel, BorderLayout.WEST);
             itemRow.add(buttonPanel, BorderLayout.LINE_END);
             itemPanel.add(itemRow);
+            System.out.println("Delete button added for item with ID: " + item.getId());
+            System.out.println("Delete buttons added: " + deleteButtons.size());
+
         }
         // VOLVER A VALIDAR Y REPAINT DE LA VISTA
         itemPanel.revalidate();
@@ -71,6 +81,8 @@ public class ToDoListView extends JFrame {
             itemRow.setPreferredSize(new Dimension(itemRow.getPreferredSize().width, 50));
             // BOTÓN ELIMINAR
             JButton deleteButton = new JButton("ELIMINAR");
+            deleteButton.setActionCommand(String.valueOf(item.getId()));
+            deleteButtons.add(deleteButton);
             // CREAR PANEL DE BOTONES Y AGREGARLOS
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             buttonPanel.add(deleteButton);
@@ -104,4 +116,18 @@ public class ToDoListView extends JFrame {
     }
 
     public void ocultarAgregarItem(boolean ocultar) { addItemButton.setVisible(!ocultar); }
+
+    public void addDeleteButtonListener(ActionListener listener) {
+        for (JButton deleteButton : deleteButtons) {
+            System.out.println("Delete button ActionListener added"); // Mensaje de depuración
+            deleteButton.addActionListener(listener);
+        }
+    }
+
+    public void addFinishButtonListener(ActionListener listener) {
+        for (JButton finishButton : finishButtons) {
+            finishButton.addActionListener(listener);
+        }
+    }
+
 }
