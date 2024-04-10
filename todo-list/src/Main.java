@@ -4,5 +4,7 @@ public class Main {
         ToDoListView view = new ToDoListView();
         @SuppressWarnings("unused")
         ToDoListController controller = new ToDoListController(view, model);
+        System.out.println("Controller instantiated");
+
     }
 }
