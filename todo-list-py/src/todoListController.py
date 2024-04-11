@@ -1,3 +1,4 @@
+# todoListController.py
 from pubsub import pub
 from item import Item
 
@@ -26,9 +27,11 @@ class ToDoListController:
 
     def update_view(self):
         if self.en_menu_principal:
-            self.view.update_unfinished(self.model.get_unfinished_items())
+            unfinished_items = self.model.get_unfinished_items()
+            self.view.update_unfinished(unfinished_items)
         else:
-            self.view.update_completed(self.model.get_completed_items())
+            completed_items = self.model.get_completed_items()
+            self.view.update_unfinished(completed_items)  # Aquí actualizamos con los completados
         self.view.actualizar_nombre_boton_menu(self.en_menu_principal)
         self.view.ocultar_agregar_item(not self.en_menu_principal)
 
@@ -44,7 +47,7 @@ class ToDoListController:
         self.update_view()
 
     def update_unfinished_items(self):
-        self.view.update_unfinished(self.model.get_unfinished_items())
+        self.update_view()  # No necesitamos obtener los elementos no finalizados aquí
 
     def update_completed_items(self):
-        self.view.update_completed(self.model.get_completed_items())
+        self.update_view()  # No necesitamos obtener los elementos completados aquí
