@@ -29,30 +29,11 @@ class ToDoListView(tk.Tk):
 
         self.en_menu_principal = True
 
-    def create_item_widget(self, item, show_buttons=True):
-        item_row = tk.Frame(self.item_panel)
-        item_row.pack(fill="x")
-
-        item_label = tk.Label(item_row, text=item.get_description())
-        item_label.pack(side="left")
-
-        if show_buttons:
-            button_panel = tk.Frame(item_row)
-            button_panel.pack(side="right")
-
-            finish_button = tk.Button(button_panel, text="FINALIZAR",
-                                      command=lambda id=item.get_id(): pub.sendMessage("finish_item", item_id=id))
-            finish_button.pack(side="left")
-
-            delete_button = tk.Button(button_panel, text="ELIMINAR",
-                                      command=lambda id=item.get_id(): pub.sendMessage("delete_item", item_id=id))
-            delete_button.pack(side="left")
-
     def mostrar_completados(self):
         if self.en_menu_principal:
             self.completados_button.config(text="SIN TERMINAR", command=self.menu_principal)
             self.add_item_button.pack_forget()
-            self.update_completed()
+            pub.sendMessage("request_completed_items")
             self.en_menu_principal = False
 
     def clear_all_widgets(self):
@@ -71,6 +52,25 @@ class ToDoListView(tk.Tk):
     def clear_item_panel(self):
         for widget in self.item_panel.winfo_children():
             widget.destroy()
+
+    def create_item_widget(self, item, show_buttons=True):
+        item_row = tk.Frame(self.item_panel)
+        item_row.pack(fill="x")
+
+        item_label = tk.Label(item_row, text=item.get_description())
+        item_label.pack(side="left")
+
+        if show_buttons:
+            button_panel = tk.Frame(item_row)
+            button_panel.pack(side="right")
+
+            finish_button = tk.Button(button_panel, text="FINALIZAR",
+                                      command=lambda id=item.get_id(): pub.sendMessage("finish_item", item_id=id))
+            finish_button.pack(side="left")
+
+            delete_button = tk.Button(button_panel, text="ELIMINAR",
+                                      command=lambda id=item.get_id(): pub.sendMessage("delete_item", item_id=id))
+            delete_button.pack(side="left")
 
     def add_item(self):
         description = self.show_input_dialog("Ingrese la descripción del nuevo ítem:")

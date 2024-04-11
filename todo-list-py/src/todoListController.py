@@ -20,9 +20,6 @@ class ToDoListController:
         self.model.add_item(Item(description))
         self.update_view()
 
-    def update_completed_items(self):
-        self.view.update_completed(self.model.get_completed_items())
-
     def mostrar_completados(self):
         self.en_menu_principal = not self.en_menu_principal
         self.update_view()
