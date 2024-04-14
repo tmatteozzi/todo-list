@@ -17,7 +17,5 @@
       </profile-state>
     </entry>
   </component>
-  <component name="ProjectRootManager">
-    <output url="file://$PROJECT_DIR$/out" />
-  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (todo-list-py)" project-jdk-type="Python SDK" />
 </project>
