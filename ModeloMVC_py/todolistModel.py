@@ -5,6 +5,7 @@ class TodoListModel:
         self.todo_list = []
         self.observers = []
 
+    # METODOS DE OBSERVERS
     def add_observer(self, observer):
         self.observers.append(observer)
 
@@ -12,6 +13,7 @@ class TodoListModel:
         for observer in self.observers:
             observer.update(self.todo_list)
 
+    # METODOS DE MODIFICACION DE LA TODOLIST
     def add_todo(self, title, description):
         new_todo = TodoItem(title, description)
         self.todo_list.append(new_todo)

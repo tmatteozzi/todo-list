@@ -3,14 +3,15 @@ class TodoListController:
         self.view = view
         self.model = model
 
-        # Configurar callbacks
+        # CONFIGURAR CALLBACKS
         self.view.set_add_todo_callback(self.add_todo)
         self.view.set_remove_todo_callback(self.remove_todo)
         self.view.set_toggle_complete_callback(self.toggle_complete)
 
-        # Agregar vista como observador
+        # AGREGAR A LA VISTA COMO OBSERVADOR
         self.model.add_observer(self.view)
 
+    # METODOS DE MODIFICACION (CONECTAN METODOS DE LA VIEW CON LOS METODOS DEL MODEL)
     def add_todo(self):
         title = self.view.ask_user_input("Título de la Tarea")
         if title:

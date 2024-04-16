@@ -7,6 +7,7 @@ class TodoListView(tk.Tk):
         self.title("Lista de Tareas")
         self.create_widgets()
 
+    # CALLBACKS
     def set_add_todo_callback(self, callback):
         self.add_todo_callback = callback
 
@@ -16,22 +17,21 @@ class TodoListView(tk.Tk):
     def set_toggle_complete_callback(self, callback):
         self.toggle_complete_callback = callback
 
+    # CREACION DEL WIDGET PRINCIPAL (INTERFACE)
     def create_widgets(self):
         self.todo_listbox = tk.Listbox(self, width=50, height=15)
         self.todo_listbox.pack(pady=10)
-
+        # BOTONES
         self.add_button = tk.Button(self, text="Agregar Tarea", command=self.add_todo)
         self.add_button.pack(pady=5)
-
         self.remove_button = tk.Button(self, text="Eliminar Tarea", command=self.remove_todo)
         self.remove_button.pack(pady=5)
-
         self.complete_button = tk.Button(self, text="Marcar como Completada", command=self.toggle_complete)
         self.complete_button.pack(pady=5)
-
         self.exit_button = tk.Button(self, text="Salir", command=self.quit)
         self.exit_button.pack(pady=5)
 
+    # METODOS DE MODIFICACION DEL TODOLIST
     def add_todo(self):
         if hasattr(self, 'add_todo_callback'):
             self.add_todo_callback()
