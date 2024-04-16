@@ -1,38 +1,30 @@
-
 class TodoListController:
-    def __init__(self, model, view):
-        self.model = model
+    def __init__(self, view, model):
         self.view = view
+        self.model = model
 
-    def add_todo(self, title, description):
-        self.model.add_todo(title, description)
+        # Configurar callbacks
+        self.view.set_add_todo_callback(self.add_todo)
+        self.view.set_remove_todo_callback(self.remove_todo)
+        self.view.set_toggle_complete_callback(self.toggle_complete)
 
-    def remove_todo(self, index):
-        self.model.remove_todo(index)
+        # Agregar vista como observador
+        self.model.add_observer(self.view)
 
-    def toggle_complete(self, index):
-        self.model.toggle_complete(index)
+    def add_todo(self):
+        title = self.view.ask_user_input("Título de la Tarea")
+        if title:
+            description = self.view.ask_user_input("Descripción de la Tarea")
+            self.model.add_todo(title, description)
 
-    def display_todos(self):
-        todos = self.model.get_all_todos()
-        self.view.show_todos(todos)
+    def remove_todo(self):
+        index = self.view.todo_listbox.curselection()
+        if index:
+            index = int(index[0])
+            self.model.remove_todo(index)
 
-    def run(self):
-        while True:
-            self.display_todos()
-            choice = self.view.get_user_choice()
-
-            if choice == '1':
-                title = self.view.get_todo_title()
-                description = self.view.get_todo_description()
-                self.add_todo(title, description)
-            elif choice == '2':
-                index = self.view.get_todo_index_to_remove()
-                self.remove_todo(index)
-            elif choice == '3':
-                index = self.view.get_todo_index_to_toggle()
-                self.toggle_complete(index)
-            elif choice == '4':
-                break
-            else:
-                self.view.show_message("Opción inválida. Inténtalo de nuevo.")
+    def toggle_complete(self):
+        index = self.view.todo_listbox.curselection()
+        if index:
+            index = int(index[0])
+            self.model.toggle_complete(index)
