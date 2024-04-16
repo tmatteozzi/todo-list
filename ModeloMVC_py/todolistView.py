@@ -1,32 +1,54 @@
+import tkinter as tk
+from tkinter import simpledialog, messagebox
 
-class TodoListView:
-    def show_todos(self, todos):
-        if todos:
-            print("Lista de tareas:")
-            for index, todo in enumerate(todos):
-                print(f"{index + 1}. {todo}")
-        else:
-            print("No hay tareas en la lista.")
+class TodoListView(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Lista de Tareas")
+        self.create_widgets()
 
-    def get_user_choice(self):
-        print("\nMenú:")
-        print("1. Agregar tarea")
-        print("2. Eliminar tarea")
-        print("3. Marcar tarea como completada/pendiente")
-        print("4. Salir")
-        return input("Selecciona una opción: ")
+    # CALLBACKS
+    def set_add_todo_callback(self, callback):
+        self.add_todo_callback = callback
 
-    def get_todo_title(self):
-        return input("Ingrese el título de la tarea: ")
+    def set_remove_todo_callback(self, callback):
+        self.remove_todo_callback = callback
 
-    def get_todo_description(self):
-        return input("Ingrese la descripción de la tarea: ")
+    def set_toggle_complete_callback(self, callback):
+        self.toggle_complete_callback = callback
 
-    def get_todo_index_to_remove(self):
-        return int(input("Ingrese el número de la tarea que desea eliminar: ")) - 1
+    # CREACION DEL WIDGET PRINCIPAL (INTERFACE)
+    def create_widgets(self):
+        self.todo_listbox = tk.Listbox(self, width=50, height=15)
+        self.todo_listbox.pack(pady=10)
+        # BOTONES
+        self.add_button = tk.Button(self, text="Agregar Tarea", command=self.add_todo)
+        self.add_button.pack(pady=5)
+        self.remove_button = tk.Button(self, text="Eliminar Tarea", command=self.remove_todo)
+        self.remove_button.pack(pady=5)
+        self.complete_button = tk.Button(self, text="Marcar como Completada", command=self.toggle_complete)
+        self.complete_button.pack(pady=5)
+        self.exit_button = tk.Button(self, text="Salir", command=self.quit)
+        self.exit_button.pack(pady=5)
 
-    def get_todo_index_to_toggle(self):
-        return int(input("Ingrese el número de la tarea que desea marcar como completada/pendiente: ")) - 1
+    # METODOS DE MODIFICACION DEL TODOLIST
+    def add_todo(self):
+        if hasattr(self, 'add_todo_callback'):
+            self.add_todo_callback()
 
-    def show_message(self, message):
-        print(message)
+    def remove_todo(self):
+        if hasattr(self, 'remove_todo_callback'):
+            self.remove_todo_callback()
+
+    def toggle_complete(self):
+        if hasattr(self, 'toggle_complete_callback'):
+            self.toggle_complete_callback()
+
+    def update(self, todos):
+        self.todo_listbox.delete(0, tk.END)
+        for todo in todos:
+            status = "Completada" if todo.completed else "Pendiente"
+            self.todo_listbox.insert(tk.END, f"{todo.title} - {todo.description} ({status})")
+
+    def ask_user_input(self, title):
+        return simpledialog.askstring(title, f"Ingrese {title.lower()} de la tarea:")
