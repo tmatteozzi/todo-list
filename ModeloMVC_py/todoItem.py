@@ -1,4 +1,3 @@
-
 class TodoItem:
     def __init__(self, title, description):
         self.title = title
@@ -7,4 +6,4 @@ class TodoItem:
 
     def __str__(self):
         status = "Completada" if self.completed else "Pendiente"
-        return f"{self.title} - {self.description} ({status})"
+        return f"{self.title} - ({status})"
