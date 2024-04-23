@@ -20,12 +20,17 @@ class TodoListView(tk.Tk):
     def set_show_details_callback(self, callback):
         self.show_details_callback = callback
 
+    def set_edit_todo_callback(self, callback):
+        self.edit_todo_callback = callback
+
     # CREACION DEL TK
     def create_widgets(self):
         self.todo_listbox = tk.Listbox(self, width=50, height=15)
         self.todo_listbox.pack(pady=10)
         self.add_button = tk.Button(self, text="Agregar Tarea", command=self.add_todo)
         self.add_button.pack(pady=5)
+        self.edit_button = tk.Button(self, text="Editar Tarea", command=self.edit_todo)
+        self.edit_button.pack(pady=5)
         self.remove_button = tk.Button(self, text="Eliminar Tarea", command=self.remove_todo)
         self.remove_button.pack(pady=5)
         self.complete_button = tk.Button(self, text="Marcar como Completada", command=self.toggle_complete)
@@ -39,6 +44,10 @@ class TodoListView(tk.Tk):
     def add_todo(self):
         if hasattr(self, 'add_todo_callback'):
             self.add_todo_callback()
+
+    def edit_todo(self):
+        if hasattr(self, 'edit_todo_callback'):
+            self.edit_todo_callback()
 
     def remove_todo(self):
         if hasattr(self, 'remove_todo_callback'):
