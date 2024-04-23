@@ -1,9 +1,7 @@
-import re
 class TodoListController:
     def __init__(self, view, model):
         self.view = view
         self.model = model
-        # CALLBACKS
         self.view.set_add_todo_callback(self.add_todo)
         self.view.set_edit_todo_callback(self.edit_todo)
         self.view.set_remove_todo_callback(self.remove_todo)
@@ -11,7 +9,6 @@ class TodoListController:
         self.view.set_show_details_callback(self.show_details)
         self.update_view()
 
-    # METODOS
     def add_todo(self):
         title = self.view.ask_user_input("Título de la Tarea")
         if title:
@@ -22,10 +19,9 @@ class TodoListController:
     def edit_todo(self):
         index = self.view.todo_listbox.curselection()
         if index:
-            item_selected = [self.view.todo_listbox.get(i) for i in index]
-            if item_selected:
-                id_item_selected = re.search(r'\[(.*?)]', item_selected[0])
-                self.edit_todo_dialog(id_item_selected.group(1))
+            task_id = self.view.task_map.get(index[0])  # OBTENER EL ID DESDE EL DICCIONARIO
+            if task_id is not None:
+                self.edit_todo_dialog(task_id)
 
     def edit_todo_dialog(self, todo_id):
         new_title = self.view.ask_user_input("Nuevo Título de la Tarea")
@@ -38,28 +34,25 @@ class TodoListController:
     def remove_todo(self):
         index = self.view.todo_listbox.curselection()
         if index:
-            item_selected = [self.view.todo_listbox.get(i) for i in index]
-            if item_selected:
-                id_item_selected = re.search(r'\[(.*?)\]', item_selected[0])
-                self.model.remove_todo(id_item_selected.group(1))
+            task_id = self.view.task_map.get(index[0])  # OBTENER EL ID DESDE EL DICCIONARIO
+            if task_id is not None:
+                self.model.remove_todo(task_id)
                 self.update_view()
 
     def toggle_complete(self):
         index = self.view.todo_listbox.curselection()
         if index:
-            item_selected = [self.view.todo_listbox.get(i) for i in index]
-            if item_selected:
-                id_item_selected = re.search(r'\[(.*?)\]', item_selected[0])
-                self.model.toggle_complete(id_item_selected.group(1))
+            task_id = self.view.task_map.get(index[0])  # OBTENER EL ID DESDE EL DICCIONARIO
+            if task_id is not None:
+                self.model.toggle_complete(task_id)
                 self.update_view()
 
     def show_details(self):
         index = self.view.todo_listbox.curselection()
         if index:
-            item_selected = [self.view.todo_listbox.get(i) for i in index]
-            if item_selected:
-                id_item_selected = re.search(r'\[(.*?)\]', item_selected[0])
-                todo = self.model.get_todo_by_id(id_item_selected.group(1))
+            task_id = self.view.task_map.get(index[0])  # OBTENER EL ID DESDE EL DICCIONARIO
+            if task_id is not None:
+                todo = self.model.get_todo_by_id(task_id)
                 status = "Completada" if todo.completed else "Pendiente"
                 self.view.show_info_panel(todo.title, todo.description, status)
 

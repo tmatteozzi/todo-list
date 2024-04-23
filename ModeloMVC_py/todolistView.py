@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import simpledialog, messagebox
+from tkinter import simpledialog
 
 class TodoListView(tk.Tk):
     def __init__(self):
@@ -9,7 +9,8 @@ class TodoListView(tk.Tk):
         self.completed_label.pack(pady=5)
         self.create_widgets()
 
-    # CALLBACKS
+        self.task_map = {}  # DICCIONARIO PARA ASOCIAR IDs DE CADA ITEM
+
     def set_add_todo_callback(self, callback):
         self.add_todo_callback = callback
 
@@ -25,7 +26,6 @@ class TodoListView(tk.Tk):
     def set_edit_todo_callback(self, callback):
         self.edit_todo_callback = callback
 
-    # CREACION DEL TK
     def create_widgets(self):
         self.todo_listbox = tk.Listbox(self, width=50, height=15)
         self.todo_listbox.pack(pady=10)
@@ -42,7 +42,6 @@ class TodoListView(tk.Tk):
         self.exit_button = tk.Button(self, text="Salir", command=self.quit)
         self.exit_button.pack(pady=5)
 
-    # METODOS
     def add_todo(self):
         if hasattr(self, 'add_todo_callback'):
             self.add_todo_callback()
@@ -65,14 +64,17 @@ class TodoListView(tk.Tk):
 
     def update(self, todos):
         self.todo_listbox.delete(0, tk.END)
+        self.task_map.clear()  # VACIAR DICCIONARIO
         for todo in todos:
             status = "Completada" if todo.completed else "Pendiente"
-            self.todo_listbox.insert(tk.END, f"[{todo.id}] {todo.title} - ({status})")
+            item = f"{todo.title} - ({status})"
+            self.todo_listbox.insert(tk.END, item)
+            task_id = self.todo_listbox.index(tk.END) - 1  # OBTENER INDICE DEL ELEMENTO
+            self.task_map[task_id] = todo.id  # HACER QUE EL INDICE SEA EL ID
 
     def update_completed_label(self, completed_count, total_count):
         self.completed_label.config(text=f"{completed_count}/{total_count} items completados")
 
-    # METODOS AUXILIARES (REUTILIZACION DE CODIGO)
     def ask_user_input(self, title):
         return simpledialog.askstring(title, f"Ingrese {title.lower()} de la tarea:")
 
