@@ -5,6 +5,8 @@ class TodoListView(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Lista de Tareas")
+        self.completed_label = tk.Label(self, text="0/0 items completados")
+        self.completed_label.pack(pady=5)
         self.create_widgets()
 
     # CALLBACKS
@@ -66,6 +68,9 @@ class TodoListView(tk.Tk):
         for todo in todos:
             status = "Completada" if todo.completed else "Pendiente"
             self.todo_listbox.insert(tk.END, f"[{todo.id}] {todo.title} - ({status})")
+
+    def update_completed_label(self, completed_count, total_count):
+        self.completed_label.config(text=f"{completed_count}/{total_count} items completados")
 
     # METODOS AUXILIARES (REUTILIZACION DE CODIGO)
     def ask_user_input(self, title):

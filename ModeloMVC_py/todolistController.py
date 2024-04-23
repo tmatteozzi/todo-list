@@ -65,4 +65,7 @@ class TodoListController:
 
     def update_view(self):
         todos = self.model.get_all_todos()
+        completed_count = sum(1 for todo in todos if todo.completed)
+        total_count = len(todos)
+        self.view.update_completed_label(completed_count, total_count)
         self.view.update(todos)
