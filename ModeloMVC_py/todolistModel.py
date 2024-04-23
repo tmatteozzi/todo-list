@@ -1,33 +1,26 @@
-from todoItem import TodoItem
+from dbBroker import dbBroker
 
 class TodoListModel:
     def __init__(self):
-        self.todo_list = []
-        self.observers = []
+        # Crear una instancia de dbBroker para poder acceder a sus métodos
+        self.db_broker = dbBroker()
 
-    # METODOS DE OBSERVERS
-    def add_observer(self, observer):
-        self.observers.append(observer)
-
-    def notify_observers(self):
-        for observer in self.observers:
-            observer.update(self.todo_list)
-
-    # METODOS DE MODIFICACION DE LA TODOLIST
     def add_todo(self, title, description):
-        new_todo = TodoItem(title, description)
-        self.todo_list.append(new_todo)
-        self.notify_observers()
+        # Llamar al método add_todo de dbBroker a través de la instancia
+        self.db_broker.add_todo(title, description)
 
-    def remove_todo(self, index):
-        if 0 <= index < len(self.todo_list):
-            del self.todo_list[index]
-            self.notify_observers()
+    def remove_todo(self, id):
+        # Llamar al método remove_todo de dbBroker a través de la instancia
+        self.db_broker.remove_todo(id)
 
-    def toggle_complete(self, index):
-        if 0 <= index < len(self.todo_list):
-            self.todo_list[index].completed = not self.todo_list[index].completed
-            self.notify_observers()
+    def toggle_complete(self, id):
+        # Llamar al método toggle_complete de dbBroker a través de la instancia
+        self.db_broker.toggle_complete(id)
 
     def get_all_todos(self):
-        return self.todo_list
+        # Llamar al método get_all_todos de dbBroker a través de la instancia
+        return self.db_broker.get_all_todos()
+
+    def get_todo_by_id(self, id):
+        # Llamar al método get_todo_by_id de dbBroker a través de la instancia
+        return self.db_broker.get_todo_by_id(id)

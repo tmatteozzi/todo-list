@@ -50,16 +50,13 @@ class TodoListView(tk.Tk):
 
     def show_details(self):
         if hasattr(self, 'show_details_callback'):
-            index = self.todo_listbox.curselection()
-            if index:
-                index = int(index[0])
-                self.show_details_callback(index)
+            self.show_details_callback()
 
     def update(self, todos):
         self.todo_listbox.delete(0, tk.END)
         for todo in todos:
             status = "Completada" if todo.completed else "Pendiente"
-            self.todo_listbox.insert(tk.END, f"{todo.title} - ({status})")
+            self.todo_listbox.insert(tk.END, f"[{todo.id}] {todo.title} - ({status})")
 
     # METODOS AUXILIARES (REUTILIZACION DE CODIGO)
     def ask_user_input(self, title):
