@@ -1,13 +1,16 @@
 import tkinter as tk
-from tkinter import simpledialog, messagebox
+from tkinter import simpledialog
 
 class TodoListView(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Lista de Tareas")
+        self.completed_label = tk.Label(self, text="0/0 items completados")
+        self.completed_label.pack(pady=5)
         self.create_widgets()
 
-    # CALLBACKS
+        self.task_map = {}  # DICCIONARIO PARA ASOCIAR IDs DE CADA ITEM
+
     def set_add_todo_callback(self, callback):
         self.add_todo_callback = callback
 
@@ -20,12 +23,16 @@ class TodoListView(tk.Tk):
     def set_show_details_callback(self, callback):
         self.show_details_callback = callback
 
-    # CREACION DEL TK
+    def set_edit_todo_callback(self, callback):
+        self.edit_todo_callback = callback
+
     def create_widgets(self):
         self.todo_listbox = tk.Listbox(self, width=50, height=15)
         self.todo_listbox.pack(pady=10)
         self.add_button = tk.Button(self, text="Agregar Tarea", command=self.add_todo)
         self.add_button.pack(pady=5)
+        self.edit_button = tk.Button(self, text="Editar Tarea", command=self.edit_todo)
+        self.edit_button.pack(pady=5)
         self.remove_button = tk.Button(self, text="Eliminar Tarea", command=self.remove_todo)
         self.remove_button.pack(pady=5)
         self.complete_button = tk.Button(self, text="Marcar como Completada", command=self.toggle_complete)
@@ -35,10 +42,13 @@ class TodoListView(tk.Tk):
         self.exit_button = tk.Button(self, text="Salir", command=self.quit)
         self.exit_button.pack(pady=5)
 
-    # METODOS
     def add_todo(self):
         if hasattr(self, 'add_todo_callback'):
             self.add_todo_callback()
+
+    def edit_todo(self):
+        if hasattr(self, 'edit_todo_callback'):
+            self.edit_todo_callback()
 
     def remove_todo(self):
         if hasattr(self, 'remove_todo_callback'):
@@ -54,11 +64,17 @@ class TodoListView(tk.Tk):
 
     def update(self, todos):
         self.todo_listbox.delete(0, tk.END)
+        self.task_map.clear()  # VACIAR DICCIONARIO
         for todo in todos:
             status = "Completada" if todo.completed else "Pendiente"
-            self.todo_listbox.insert(tk.END, f"[{todo.id}] {todo.title} - ({status})")
+            item = f"{todo.title} - ({status})"
+            self.todo_listbox.insert(tk.END, item)
+            task_id = self.todo_listbox.index(tk.END) - 1  # OBTENER INDICE DEL ELEMENTO
+            self.task_map[task_id] = todo.id  # HACER QUE EL INDICE SEA EL ID
 
-    # METODOS AUXILIARES (REUTILIZACION DE CODIGO)
+    def update_completed_label(self, completed_count, total_count):
+        self.completed_label.config(text=f"{completed_count}/{total_count} items completados")
+
     def ask_user_input(self, title):
         return simpledialog.askstring(title, f"Ingrese {title.lower()} de la tarea:")
 

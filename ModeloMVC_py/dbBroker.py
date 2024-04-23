@@ -12,6 +12,14 @@ class dbBroker:
         session.add(new_todo)
         session.commit()
 
+    def edit_todo(self, id, new_title, new_description):
+        session = Session()
+        todo = session.query(TodoItem).filter_by(id=id).first()
+        if todo:
+            todo.title = new_title
+            todo.description = new_description
+            session.commit()
+
     def remove_todo(self, id):
         session = Session()
         todo = session.query(TodoItem).filter_by(id=id).first()
