@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean
 
-from ModeloMVC_py.config import Base
+from config import Base
 
 
 class TodoItem(Base):
