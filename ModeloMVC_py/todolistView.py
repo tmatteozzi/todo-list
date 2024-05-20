@@ -76,10 +76,10 @@ class TodoListView(tk.Tk):
         self.completed_label.config(text=f"{completed_count}/{total_count} items completados")
 
     def ask_user_input(self, title):
-        data = simpledialog.askstring(title, f"Ingrese {title.lower()} de la tarea:")
+        data = simpledialog.askstring(title, f"Ingrese {title.lower()}:")
         while (data == ''):
             simpledialog.messagebox.showerror("Error", "Este campo no puede estar vacío.")
-            data = simpledialog.askstring(title, f"Ingrese {title.lower()} de la tarea:")
+            data = simpledialog.askstring(title, f"Ingrese {title.lower()}:")
         return data
 
     def show_info_panel(self, title, description, status):
