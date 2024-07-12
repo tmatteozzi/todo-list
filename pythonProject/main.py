@@ -1,9 +1,9 @@
+# main.py
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+from model import owncloud_client
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-    tasks = []
-
     def _set_headers(self, content_type="text/html"):
         self.send_response(200)
         self.send_header("Content-type", content_type)
@@ -12,6 +12,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/':
             self.serve_html()
+        elif self.path == '/tasks':
+            self.serve_tasks()
         else:
             self.send_response(404)
             self.end_headers()
@@ -27,6 +29,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(b"404 Not Found")
 
+    def serve_tasks(self):
+        tasks = owncloud_client.download_tasks()
+        self._set_headers("application/json")
+        self.wfile.write(json.dumps(tasks).encode('utf-8'))
+
     def do_POST(self):
         if self.path == '/add_task':
             content_length = int(self.headers['Content-Length'])
@@ -37,7 +44,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 'task': task_data['task'],
                 'description': task_data['description']
             }
-            self.tasks.append(task)
+            
+            tasks = owncloud_client.download_tasks()
+            tasks.append(task)
+            owncloud_client.upload_task(tasks)
 
             self._set_headers("application/json")
             self.wfile.write(json.dumps(task).encode('utf-8'))

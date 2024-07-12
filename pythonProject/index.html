@@ -89,6 +89,18 @@
     <ul id="task-list"></ul>
 </div>
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        fetch('/tasks')
+            .then(response => response.json())
+            .then(tasks => {
+                tasks.forEach(task => {
+                    addTaskToDOM(task.task, task.description);
+                });
+                updateCounters();
+            })
+            .catch(error => console.error('Error loading tasks:', error));
+    });
+
     function updateCounters() {
         const tasks = document.querySelectorAll('#task-list li');
         let completedCount = 0;
@@ -130,34 +142,38 @@
         })
             .then(response => response.json())
             .then(data => {
-                var li = document.createElement('li');
-
-                var taskTitle = document.createElement('span');
-                taskTitle.textContent = data.task;
-                li.appendChild(taskTitle);
-
-                var taskDescriptionElem = document.createElement('p');
-                taskDescriptionElem.textContent = data.description;
-                li.appendChild(taskDescriptionElem);
-
-                li.addEventListener('click', function() {
-                    li.classList.toggle('completed');
-                    updateCounters();
-                });
-
-                var deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.onclick = function() {
-                    li.remove();
-                    updateCounters();
-                };
-
-                li.appendChild(deleteBtn);
-                document.getElementById('task-list').appendChild(li);
+                addTaskToDOM(data.task, data.description);
                 taskInput.value = '';
                 updateCounters();
             })
             .catch(error => console.error('Error:', error));
+    }
+
+    function addTaskToDOM(taskText, taskDescription) {
+        var li = document.createElement('li');
+
+        var taskTitle = document.createElement('span');
+        taskTitle.textContent = taskText;
+        li.appendChild(taskTitle);
+
+        var taskDescriptionElem = document.createElement('p');
+        taskDescriptionElem.textContent = taskDescription;
+        li.appendChild(taskDescriptionElem);
+
+        li.addEventListener('click', function() {
+            li.classList.toggle('completed');
+            updateCounters();
+        });
+
+        var deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = function() {
+            li.remove();
+            updateCounters();
+        };
+
+        li.appendChild(deleteBtn);
+        document.getElementById('task-list').appendChild(li);
     }
 </script>
 </body>
