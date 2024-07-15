@@ -1,4 +1,3 @@
-# main.py
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from model import owncloud_client
@@ -42,7 +41,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
             task = {
                 'task': task_data['task'],
-                'description': task_data['description']
+                'description': task_data['description'],
+                'completed': task_data.get('completed', False)
             }
             
             tasks = owncloud_client.download_tasks()
@@ -52,7 +52,49 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self._set_headers("application/json")
             self.wfile.write(json.dumps(task).encode('utf-8'))
 
-def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8080):
+    def do_DELETE(self):
+        if self.path.startswith('/delete_task'):
+            task_id = self.path.split('/')[-1]
+            tasks = owncloud_client.download_tasks()
+            task_found = False
+            for task in tasks:
+                if task['task'] == task_id:
+                    tasks.remove(task)
+                    task_found = True
+                    break
+            
+            if task_found:
+                owncloud_client.upload_task(tasks)
+                self._set_headers("application/json")
+                self.wfile.write(json.dumps({'status': 'success'}).encode('utf-8'))
+            else:
+                self.send_response(404)
+                self.end_headers()
+
+    def do_PUT(self):
+        if self.path.startswith('/update_task'):
+            content_length = int(self.headers['Content-Length'])
+            put_data = self.rfile.read(content_length)
+            updated_task = json.loads(put_data)
+
+            task_id = self.path.split('/')[-1]
+            tasks = owncloud_client.download_tasks()
+            task_found = False
+            for task in tasks:
+                if task['task'] == task_id:
+                    task['completed'] = updated_task.get('completed', task['completed'])
+                    task_found = True
+                    break
+            
+            if task_found:
+                owncloud_client.upload_task(tasks)
+                self._set_headers("application/json")
+                self.wfile.write(json.dumps({'status': 'success'}).encode('utf-8'))
+            else:
+                self.send_response(404)
+                self.end_headers()
+
+def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8090):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print(f'Starting httpd on port {port}...')

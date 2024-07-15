@@ -1,4 +1,3 @@
-# model.py
 import requests
 import json
 
@@ -7,7 +6,6 @@ class OwnCloudClient:
         self.base_url = base_url
         self.username = username
         self.password = password
-
 
     def upload_task(self, task_data):
         url = f"{self.base_url}/remote.php/dav/files/{self.username}/tasks.json"

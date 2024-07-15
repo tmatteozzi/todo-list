@@ -94,7 +94,7 @@
             .then(response => response.json())
             .then(tasks => {
                 tasks.forEach(task => {
-                    addTaskToDOM(task.task, task.description);
+                    addTaskToDOM(task.task, task.description, task.completed);
                 });
                 updateCounters();
             })
@@ -142,15 +142,18 @@
         })
             .then(response => response.json())
             .then(data => {
-                addTaskToDOM(data.task, data.description);
+                addTaskToDOM(data.task, data.description, false);
                 taskInput.value = '';
                 updateCounters();
             })
             .catch(error => console.error('Error:', error));
     }
 
-    function addTaskToDOM(taskText, taskDescription) {
+    function addTaskToDOM(taskText, taskDescription, completed) {
         var li = document.createElement('li');
+        if (completed) {
+            li.classList.add('completed');
+        }
 
         var taskTitle = document.createElement('span');
         taskTitle.textContent = taskText;
@@ -160,16 +163,47 @@
         taskDescriptionElem.textContent = taskDescription;
         li.appendChild(taskDescriptionElem);
 
-        li.addEventListener('click', function() {
-            li.classList.toggle('completed');
-            updateCounters();
+        // Update event for completing tasks
+        li.addEventListener('click', function(event) {
+            if (event.target.tagName !== 'BUTTON') { // Ensure the click is not on the delete button
+                li.classList.toggle('completed');
+                fetch(`/update_task/${taskText}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ completed: li.classList.contains('completed') })
+                })
+                .then(response => {
+                    if (response.status !== 200) {
+                        li.classList.toggle('completed'); // Revert if update failed
+                        alert('Failed to update task');
+                    }
+                    updateCounters();
+                })
+                .catch(error => {
+                    li.classList.toggle('completed'); // Revert if error occurred
+                    console.error('Error:', error);
+                });
+            }
         });
 
         var deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Delete';
-        deleteBtn.onclick = function() {
-            li.remove();
-            updateCounters();
+        deleteBtn.onclick = function(event) {
+            event.stopPropagation(); // Prevent the click event from propagating to the li
+            fetch(`/delete_task/${taskText}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    li.remove();
+                    updateCounters();
+                } else {
+                    alert('Failed to delete task');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         };
 
         li.appendChild(deleteBtn);
