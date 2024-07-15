@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .counter {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background: #f4f4f4;
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            display: flex;
+            flex-direction: column;
+        }
+        ul li.completed {
+            text-decoration: line-through;
+            color: grey;
+        }
+        ul li button {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+        ul li p {
+            color: grey;
+            margin: 5px 0 0 0;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        button.add-btn {
+            width: 100%;
+            background: green;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>To-Do List</h1>
+    <div class="counter">
+        <p>Completed: <span id="completed-count">0</span> | Incomplete: <span id="incomplete-count">0</span></p>
+        <p>Percentage Completed: <span id="percentage-completed">0%</span></p>
+    </div>
+    <input type="text" id="new-task" placeholder="New task...">
+    <button class="add-btn" onclick="addTask()">Add Task</button>
+    <ul id="task-list"></ul>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        fetch('/tasks')
+            .then(response => response.json())
+            .then(tasks => {
+                tasks.forEach(task => {
+                    addTaskToDOM(task.task, task.description, task.completed);
+                });
+                updateCounters();
+            })
+            .catch(error => console.error('Error loading tasks:', error));
+    });
+
+    function updateCounters() {
+        const tasks = document.querySelectorAll('#task-list li');
+        let completedCount = 0;
+        let incompleteCount = 0;
+        tasks.forEach(task => {
+            if (task.classList.contains('completed')) {
+                completedCount++;
+            } else {
+                incompleteCount++;
+            }
+        });
+        const totalTasks = tasks.length;
+        const percentageCompleted = totalTasks === 0 ? 0 : Math.round((completedCount / totalTasks) * 100);
+
+        document.getElementById('completed-count').textContent = completedCount;
+        document.getElementById('incomplete-count').textContent = incompleteCount;
+        document.getElementById('percentage-completed').textContent = percentageCompleted + '%';
+    }
+
+    function addTask() {
+        var taskInput = document.getElementById('new-task');
+        var taskText = taskInput.value;
+        if (taskText === '') {
+            alert('Please enter a task');
+            return;
+        }
+
+        var taskDescription = prompt("Please enter a description for the task:", "");
+        if (taskDescription === null || taskDescription === "") {
+            taskDescription = "No description";
+        }
+
+        fetch('/add_task', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ task: taskText, description: taskDescription })
+        })
+            .then(response => response.json())
+            .then(data => {
+                addTaskToDOM(data.task, data.description, false);
+                taskInput.value = '';
+                updateCounters();
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function addTaskToDOM(taskText, taskDescription, completed) {
+        var li = document.createElement('li');
+        if (completed) {
+            li.classList.add('completed');
+        }
+
+        var taskTitle = document.createElement('span');
+        taskTitle.textContent = taskText;
+        li.appendChild(taskTitle);
+
+        var taskDescriptionElem = document.createElement('p');
+        taskDescriptionElem.textContent = taskDescription;
+        li.appendChild(taskDescriptionElem);
+
+        // Update event for completing tasks
+        li.addEventListener('click', function(event) {
+            if (event.target.tagName !== 'BUTTON') { // Ensure the click is not on the delete button
+                li.classList.toggle('completed');
+                fetch(`/update_task/${taskText}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ completed: li.classList.contains('completed') })
+                })
+                .then(response => {
+                    if (response.status !== 200) {
+                        li.classList.toggle('completed'); // Revert if update failed
+                        alert('Failed to update task');
+                    }
+                    updateCounters();
+                })
+                .catch(error => {
+                    li.classList.toggle('completed'); // Revert if error occurred
+                    console.error('Error:', error);
+                });
+            }
+        });
+
+        var deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = function(event) {
+            event.stopPropagation(); // Prevent the click event from propagating to the li
+            fetch(`/delete_task/${taskText}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    li.remove();
+                    updateCounters();
+                } else {
+                    alert('Failed to delete task');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        };
+
+        li.appendChild(deleteBtn);
+        document.getElementById('task-list').appendChild(li);
+    }
+</script>
+</body>
+</html>
