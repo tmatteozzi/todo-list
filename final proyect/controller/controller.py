@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import requests
+from socketserver import ThreadingMixIn
 
 MODEL_SERVER_URL = "http://192.168.68.55:2004"
 
@@ -62,7 +63,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self._set_headers("application/json")
             self.wfile.write(response.content)
 
-def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8090):
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+    pass
+
+def run(server_class=ThreadingHTTPServer, handler_class=SimpleHTTPRequestHandler, port=8090):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print(f'Starting httpd on port {port}...')

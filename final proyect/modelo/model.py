@@ -1,6 +1,5 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-import requests
 
 class OwnCloudClient:
     def __init__(self, base_url, username, password):
