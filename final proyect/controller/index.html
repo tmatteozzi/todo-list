@@ -167,12 +167,12 @@
         li.addEventListener('click', function(event) {
             if (event.target.tagName !== 'BUTTON') { // Ensure the click is not on the delete button
                 li.classList.toggle('completed');
-                fetch(`/update_task/${taskText}`, {
+                fetch(`/update_task`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ completed: li.classList.contains('completed') })
+                    body: JSON.stringify({ task: taskText, completed: li.classList.contains('completed') })
                 })
                 .then(response => {
                     if (response.status !== 200) {
@@ -192,8 +192,12 @@
         deleteBtn.textContent = 'Delete';
         deleteBtn.onclick = function(event) {
             event.stopPropagation(); // Prevent the click event from propagating to the li
-            fetch(`/delete_task/${taskText}`, {
-                method: 'DELETE'
+            fetch(`/delete_task`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ task: taskText })
             })
             .then(response => {
                 if (response.status === 200) {

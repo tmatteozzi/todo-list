@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-import requests
 from urllib.parse import unquote
+import requests
 
 class OwnCloudClient:
     def __init__(self, base_url, username, password):
@@ -9,10 +9,10 @@ class OwnCloudClient:
         self.username = username
         self.password = password
 
-    def upload_task(self, task_data):
+    def upload_tasks(self, tasks):
         url = f"{self.base_url}/remote.php/dav/files/{self.username}/tasks.json"
         headers = {"Content-Type": "application/json"}
-        response = requests.put(url, headers=headers, data=json.dumps(task_data), auth=(self.username, self.password))
+        response = requests.put(url, headers=headers, data=json.dumps(tasks), auth=(self.username, self.password))
         return response.status_code == 201 or response.status_code == 204
 
     def download_tasks(self):
@@ -21,7 +21,6 @@ class OwnCloudClient:
         if response.status_code == 200:
             return json.loads(response.content)
         return []
-
 
 owncloud_client = OwnCloudClient("http://localhost/owncloud", "Matias", "PasswordOwncloud")
 
@@ -51,28 +50,30 @@ class ModelHTTPRequestHandler(BaseHTTPRequestHandler):
                 'description': task_data['description'],
                 'completed': task_data.get('completed', False)
             }
-            
+
             tasks = owncloud_client.download_tasks()
             tasks.append(task)
-            owncloud_client.upload_task(tasks)
+            owncloud_client.upload_tasks(tasks)
 
             self._set_headers()
             self.wfile.write(json.dumps(task).encode('utf-8'))
 
     def do_DELETE(self):
-        if self.path.startswith('/delete_task'):
-            task_id = self.path.split('/')[-1]
-            task_id = unquote(task_id)  # Decode the task name from the URL
+        if self.path == '/delete_task':
+            content_length = int(self.headers['Content-Length'])
+            delete_data = self.rfile.read(content_length)
+            task_data = json.loads(delete_data)
+
             tasks = owncloud_client.download_tasks()
             task_found = False
             for task in tasks:
-                if task['task'] == task_id:
+                if task['task'] == task_data['task']:
                     tasks.remove(task)
                     task_found = True
                     break
-            
+
             if task_found:
-                owncloud_client.upload_task(tasks)
+                owncloud_client.upload_tasks(tasks)
                 self._set_headers()
                 self.wfile.write(json.dumps({'status': 'success'}).encode('utf-8'))
             else:
@@ -80,23 +81,21 @@ class ModelHTTPRequestHandler(BaseHTTPRequestHandler):
                 self.end_headers()
 
     def do_PUT(self):
-        if self.path.startswith('/update_task'):
+        if self.path == '/update_task':
             content_length = int(self.headers['Content-Length'])
             put_data = self.rfile.read(content_length)
             updated_task = json.loads(put_data)
 
-            task_id = self.path.split('/')[-1]
-            task_id = unquote(task_id)  # Decode the task name from the URL
             tasks = owncloud_client.download_tasks()
             task_found = False
             for task in tasks:
-                if task['task'] == task_id:
+                if task['task'] == updated_task['task']:
                     task['completed'] = updated_task.get('completed', task['completed'])
                     task_found = True
                     break
-            
+
             if task_found:
-                owncloud_client.upload_task(tasks)
+                owncloud_client.upload_tasks(tasks)
                 self._set_headers()
                 self.wfile.write(json.dumps({'status': 'success'}).encode('utf-8'))
             else:
