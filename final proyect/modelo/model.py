@@ -1,5 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+import requests
+from urllib.parse import unquote
 
 class OwnCloudClient:
     def __init__(self, base_url, username, password):
@@ -20,7 +22,7 @@ class OwnCloudClient:
             return json.loads(response.content)
         return []
 
-# Replace with your ownCloud credentials and URL
+
 owncloud_client = OwnCloudClient("http://localhost/owncloud", "Matias", "PasswordOwncloud")
 
 class ModelHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -60,6 +62,7 @@ class ModelHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_DELETE(self):
         if self.path.startswith('/delete_task'):
             task_id = self.path.split('/')[-1]
+            task_id = unquote(task_id)  # Decode the task name from the URL
             tasks = owncloud_client.download_tasks()
             task_found = False
             for task in tasks:
@@ -83,6 +86,7 @@ class ModelHTTPRequestHandler(BaseHTTPRequestHandler):
             updated_task = json.loads(put_data)
 
             task_id = self.path.split('/')[-1]
+            task_id = unquote(task_id)  # Decode the task name from the URL
             tasks = owncloud_client.download_tasks()
             task_found = False
             for task in tasks:

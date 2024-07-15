@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import requests
+from urllib.parse import quote
 from socketserver import ThreadingMixIn
 
 MODEL_SERVER_URL = "http://192.168.68.55:2004"
@@ -50,6 +51,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_DELETE(self):
         if self.path.startswith('/delete_task'):
             task_id = self.path.split('/')[-1]
+            task_id = quote(task_id)  # Encode the task name for the URL
             response = requests.delete(f"{MODEL_SERVER_URL}/delete_task/{task_id}")
             self._set_headers("application/json")
             self.wfile.write(response.content)
@@ -59,6 +61,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             content_length = int(self.headers['Content-Length'])
             put_data = self.rfile.read(content_length)
             task_id = self.path.split('/')[-1]
+            task_id = quote(task_id)  # Encode the task name for the URL
             response = requests.put(f"{MODEL_SERVER_URL}/update_task/{task_id}", data=put_data)
             self._set_headers("application/json")
             self.wfile.write(response.content)
