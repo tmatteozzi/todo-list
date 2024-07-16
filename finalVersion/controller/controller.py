@@ -144,7 +144,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests in a separate thread."""
 
-def run(server_class=ThreadedHTTPServer, handler_class=SimpleHTTPRequestHandler, port=8000):
+def run(server_class=ThreadedHTTPServer, handler_class=SimpleHTTPRequestHandler, port=8090):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print(f'Starting httpd server on port {port}...')

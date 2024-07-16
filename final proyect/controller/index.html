@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List</title>
     <style>
+        /* Existing styles */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -21,6 +22,7 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 300px;
+
         }
         h1 {
             text-align: center;
@@ -54,6 +56,7 @@
             border-radius: 3px;
             cursor: pointer;
             align-self: flex-end;
+            margin-bottom: 4px;
         }
         ul li p {
             color: grey;
@@ -75,71 +78,157 @@
             border-radius: 3px;
             cursor: pointer;
         }
+        /* New styles for login form */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+        .login-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: blue;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .logout-btn {
+            width: 100%;
+            background-color: darkred;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 3px;
+            cursor: pointer;
+
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>To-Do List</h1>
-    <div class="counter">
-        <p>Completed: <span id="completed-count">0</span> | Incomplete: <span id="incomplete-count">0</span></p>
-        <p>Percentage Completed: <span id="percentage-completed">0%</span></p>
+    <!-- Login Form -->
+    <div class="login-container" id="login-container">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
     </div>
-    <input type="text" id="new-task" placeholder="New task...">
-    <button class="add-btn" onclick="addTask()">Add Task</button>
-    <ul id="task-list"></ul>
-</div>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        fetch('/tasks')
+    <!-- Task List -->
+    <div class="container" id="task-container" style="display: none;">
+        <h1>To-Do List</h1>
+
+        <div class="counter">
+            <p>Completed: <span id="completed-count">0</span> | Incomplete: <span id="incomplete-count">0</span></p>
+            <p>Percentage Completed: <span id="percentage-completed">0%</span></p>
+        </div>
+        <input type="text" id="new-task" placeholder="New task...">
+        <button class="add-btn" onclick="addTask()">Add Task</button>
+        <ul id="task-list"></ul>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+    <script>
+        let username = '';
+        let password = '';
+
+        function login() {
+            username = document.getElementById('username').value;
+            password = document.getElementById('password').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('login-container').style.display = 'none';
+                    document.getElementById('task-container').style.display = 'block';
+                    loadTasks();
+                } else {
+                    alert('Login failed!');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function logout() {
+            document.getElementById('login-container').style.display = 'block';
+            document.getElementById('task-container').style.display = 'none';
+        }
+
+        function loadTasks() {
+            fetch('/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
             .then(response => response.json())
             .then(tasks => {
+                const taskList = document.getElementById('task-list');
+                taskList.innerHTML = '';
                 tasks.forEach(task => {
                     addTaskToDOM(task.task, task.description, task.completed);
                 });
                 updateCounters();
             })
             .catch(error => console.error('Error loading tasks:', error));
-    });
+        }
 
-    function updateCounters() {
-        const tasks = document.querySelectorAll('#task-list li');
-        let completedCount = 0;
-        let incompleteCount = 0;
-        tasks.forEach(task => {
-            if (task.classList.contains('completed')) {
-                completedCount++;
-            } else {
-                incompleteCount++;
+        function updateCounters() {
+            const tasks = document.querySelectorAll('#task-list li');
+            let completedCount = 0;
+            let incompleteCount = 0;
+            tasks.forEach(task => {
+                if (task.classList.contains('completed')) {
+                    completedCount++;
+                } else {
+                    incompleteCount++;
+                }
+            });
+            const totalTasks = tasks.length;
+            const percentageCompleted = totalTasks === 0 ? 0 : Math.round((completedCount / totalTasks) * 100);
+
+            document.getElementById('completed-count').textContent = completedCount;
+            document.getElementById('incomplete-count').textContent = incompleteCount;
+            document.getElementById('percentage-completed').textContent = percentageCompleted + '%';
+        }
+
+        function addTask() {
+            var taskInput = document.getElementById('new-task');
+            var taskText = taskInput.value;
+            if (taskText === '') {
+                alert('Please enter a task');
+                return;
             }
-        });
-        const totalTasks = tasks.length;
-        const percentageCompleted = totalTasks === 0 ? 0 : Math.round((completedCount / totalTasks) * 100);
 
-        document.getElementById('completed-count').textContent = completedCount;
-        document.getElementById('incomplete-count').textContent = incompleteCount;
-        document.getElementById('percentage-completed').textContent = percentageCompleted + '%';
-    }
+            var taskDescription = prompt("Please enter a description for the task:", "");
+            if (taskDescription === null || taskDescription === "") {
+                taskDescription = "No description";
+            }
 
-    function addTask() {
-        var taskInput = document.getElementById('new-task');
-        var taskText = taskInput.value;
-        if (taskText === '') {
-            alert('Please enter a task');
-            return;
-        }
-
-        var taskDescription = prompt("Please enter a description for the task:", "");
-        if (taskDescription === null || taskDescription === "") {
-            taskDescription = "No description";
-        }
-
-        fetch('/add_task', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ task: taskText, description: taskDescription })
-        })
+            fetch('/add_task', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ task: taskText, description: taskDescription, username, password })
+            })
             .then(response => response.json())
             .then(data => {
                 addTaskToDOM(data.task, data.description, false);
@@ -147,72 +236,107 @@
                 updateCounters();
             })
             .catch(error => console.error('Error:', error));
-    }
-
-    function addTaskToDOM(taskText, taskDescription, completed) {
-        var li = document.createElement('li');
-        if (completed) {
-            li.classList.add('completed');
         }
 
-        var taskTitle = document.createElement('span');
-        taskTitle.textContent = taskText;
-        li.appendChild(taskTitle);
-
-        var taskDescriptionElem = document.createElement('p');
-        taskDescriptionElem.textContent = taskDescription;
-        li.appendChild(taskDescriptionElem);
-
-        // Update event for completing tasks
-        li.addEventListener('click', function(event) {
-            if (event.target.tagName !== 'BUTTON') { // Ensure the click is not on the delete button
-                li.classList.toggle('completed');
-                fetch(`/update_task`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ task: taskText, completed: li.classList.contains('completed') })
-                })
-                .then(response => {
-                    if (response.status !== 200) {
-                        li.classList.toggle('completed'); // Revert if update failed
-                        alert('Failed to update task');
-                    }
-                    updateCounters();
-                })
-                .catch(error => {
-                    li.classList.toggle('completed'); // Revert if error occurred
-                    console.error('Error:', error);
-                });
+        function modifyTask(oldTaskText) {
+            const newTaskText = prompt("Enter new task title:", oldTaskText);
+            if (newTaskText === null || newTaskText === "") {
+                alert('Task title cannot be empty');
+                return;
             }
-        });
 
-        var deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.onclick = function(event) {
-            event.stopPropagation(); // Prevent the click event from propagating to the li
-            fetch(`/delete_task`, {
-                method: 'DELETE',
+            const newTaskDescription = prompt("Enter new task description:");
+            if (newTaskDescription === null || newTaskDescription === "") {
+                alert('Task description cannot be empty');
+                return;
+            }
+
+            fetch('/update_task', {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ task: taskText })
+                body: JSON.stringify({ old_task: oldTaskText, task: newTaskText, description: newTaskDescription, username, password })
             })
-            .then(response => {
-                if (response.status === 200) {
-                    li.remove();
-                    updateCounters();
-                } else {
-                    alert('Failed to delete task');
-                }
+            .then(response => response.json())
+            .then(data => {
+                loadTasks(); // Reload tasks to reflect changes
             })
             .catch(error => console.error('Error:', error));
-        };
+        }
 
-        li.appendChild(deleteBtn);
-        document.getElementById('task-list').appendChild(li);
-    }
-</script>
+        function addTaskToDOM(taskText, taskDescription, completed) {
+            var li = document.createElement('li');
+            if (completed) {
+                li.classList.add('completed');
+            }
+
+            var taskTitle = document.createElement('span');
+            taskTitle.textContent = taskText;
+            li.appendChild(taskTitle);
+
+            var taskDescriptionElem = document.createElement('p');
+            taskDescriptionElem.textContent = taskDescription;
+            li.appendChild(taskDescriptionElem);
+
+            // Update event for completing tasks
+            li.addEventListener('click', function(event) {
+                if (event.target.tagName !== 'BUTTON') { // Ensure the click is not on the delete button
+                    li.classList.toggle('completed');
+                    fetch(`/update_task`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ task: taskText, completed: li.classList.contains('completed'), username, password })
+                    })
+                    .then(response => {
+                        if (response.status !== 200) {
+                            li.classList.toggle('completed'); // Revert if update failed
+                            alert('Failed to update task');
+                        }
+                        updateCounters();
+                    })
+                    .catch(error => {
+                        li.classList.toggle('completed'); // Revert if error occurred
+                        console.error('Error:', error);
+                    });
+                }
+            });
+
+            var modifyBtn = document.createElement('button');
+            modifyBtn.textContent = 'Modify';
+            modifyBtn.onclick = function(event) {
+                event.stopPropagation(); // Prevent the click event from propagating to the li
+                modifyTask(taskText);
+            };
+
+            var deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.onclick = function(event) {
+                event.stopPropagation(); // Prevent the click event from propagating to the li
+                fetch(`/delete_task`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ task: taskText, username, password })
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        li.remove();
+                        updateCounters();
+                    } else {
+                        alert('Failed to delete task');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            };
+
+            li.appendChild(modifyBtn);
+            li.appendChild(deleteBtn);
+            document.getElementById('task-list').appendChild(li);
+        }
+    </script>
 </body>
 </html>
